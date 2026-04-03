@@ -52,8 +52,10 @@
                             <a href="{{ route('consultas.show', $consulta) }}" class="btn btn-secondary btn-sm">Ver</a>
                             @if($consulta->status === 'completed')
                                 <a href="{{ route('consultas.export', $consulta) }}" class="btn btn-primary btn-sm">Exportar</a>
-                            @elseif($consulta->status !== 'processing' && auth()->user()->isAdmin())
-                                <a href="{{ route('consultas.process', $consulta) }}" class="btn btn-primary btn-sm">Procesar</a>
+                            @elseif(in_array($consulta->status, ['pending', 'processing']) && auth()->user()->isAdmin())
+                                <a href="{{ route('consultas.process', $consulta) }}" class="btn btn-primary btn-sm">
+                                    {{ $consulta->status === 'processing' ? 'Reanudar' : 'Procesar' }}
+                                </a>
                             @endif
                         </td>
                     </tr>

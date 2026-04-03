@@ -79,7 +79,22 @@ class ConsultaController extends Controller
     public function process(Consulta $consulta)
     {
         $this->authorizeConsulta($consulta);
-        return view('consultas.process', compact('consulta'));
+
+        $processed = $consulta->results()
+            ->whereIn('status', ['success', 'error'])
+            ->orderByDesc('id')
+            ->get()
+            ->map(fn ($r) => [
+                'cedula' => $r->cedula,
+                'status' => $r->status,
+                'nombre' => $r->nombre_completo,
+                'error' => $r->error_message,
+                'municipio' => $r->municipio,
+                'estado_afiliado' => $r->estado_afiliado,
+                'regimen' => $r->regimen,
+            ]);
+
+        return view('consultas.process', compact('consulta', 'processed'));
     }
 
     /**
