@@ -9,7 +9,8 @@ use Illuminate\Http\JsonResponse;
 class ConsultaCedulaController extends Controller
 {
     /**
-     * Retorna la información más reciente de un afiliado por cédula.
+     * Retorna el historial completo de consultas de un afiliado por cédula,
+     * ordenado del más reciente al más antiguo.
      *
      * GET /api/consulta/cedula/{cedula}
      *
@@ -17,12 +18,12 @@ class ConsultaCedulaController extends Controller
      */
     public function show(string $cedula): JsonResponse
     {
-        $resultado = ConsultaResult::where('cedula', $cedula)
+        $resultados = ConsultaResult::where('cedula', $cedula)
             ->where('status', 'success')
             ->latest('updated_at')
-            ->first();
+            ->get();
 
-        if (! $resultado) {
+        if ($resultados->isEmpty()) {
             return response()->json([
                 'success' => false,
                 'message' => 'No se encontraron resultados para la cédula proporcionada.',
@@ -30,31 +31,34 @@ class ConsultaCedulaController extends Controller
             ], 404);
         }
 
+        $data = $resultados->map(fn (ConsultaResult $r) => [
+            'cedula'            => $r->cedula,
+            'tipo_documento'    => $r->tipo_documento,
+            'primer_nombre'     => $r->primer_nombre,
+            'segundo_nombre'    => $r->segundo_nombre,
+            'primer_apellido'   => $r->primer_apellido,
+            'segundo_apellido'  => $r->segundo_apellido,
+            'nombre_completo'   => $r->nombre_completo,
+            'departamento'      => $r->departamento,
+            'municipio'         => $r->municipio,
+            'direccion'         => $r->direccion,
+            'regimen'           => $r->regimen,
+            'estado_afiliado'   => $r->estado_afiliado,
+            'sede'              => $r->sede,
+            'ips'               => $r->ips,
+            'celular'           => $r->celular,
+            'telefono_fijo'     => $r->telefono_fijo,
+            'correo'            => $r->correo,
+            'poblacion_especial'=> $r->poblacion_especial,
+            'grupo_etnico'      => $r->grupo_etnico,
+            'consultado_en'     => $r->updated_at?->toIso8601String(),
+        ]);
+
         return response()->json([
             'success' => true,
             'message' => 'Consulta exitosa.',
-            'data'    => [
-                'cedula'            => $resultado->cedula,
-                'tipo_documento'    => $resultado->tipo_documento,
-                'primer_nombre'     => $resultado->primer_nombre,
-                'segundo_nombre'    => $resultado->segundo_nombre,
-                'primer_apellido'   => $resultado->primer_apellido,
-                'segundo_apellido'  => $resultado->segundo_apellido,
-                'nombre_completo'   => $resultado->nombre_completo,
-                'departamento'      => $resultado->departamento,
-                'municipio'         => $resultado->municipio,
-                'direccion'         => $resultado->direccion,
-                'regimen'           => $resultado->regimen,
-                'estado_afiliado'   => $resultado->estado_afiliado,
-                'sede'              => $resultado->sede,
-                'ips'               => $resultado->ips,
-                'celular'           => $resultado->celular,
-                'telefono_fijo'     => $resultado->telefono_fijo,
-                'correo'            => $resultado->correo,
-                'poblacion_especial'=> $resultado->poblacion_especial,
-                'grupo_etnico'      => $resultado->grupo_etnico,
-                'consultado_en'     => $resultado->updated_at?->toIso8601String(),
-            ],
+            'total'   => $data->count(),
+            'data'    => $data,
         ]);
     }
 }
