@@ -381,6 +381,16 @@
                 <li><a href="{{ route('consultas.index') }}" class="{{ request()->routeIs('consultas.index') ? 'active' : '' }}">Consultas</a></li>
                 @if(auth()->user()->isAdmin())
                     <li><a href="{{ route('users.index') }}" class="{{ request()->routeIs('users.*') ? 'active' : '' }}">Usuarios</a></li>
+                    <li>
+                        <a href="{{ route('coosalud.credentials') }}" class="{{ request()->routeIs('coosalud.*') ? 'active' : '' }}" style="display:inline-flex;align-items:center;gap:6px;">
+                            API
+                            @if(session()->has('coosalud_api_url'))
+                                <span style="width:8px;height:8px;border-radius:50%;background:#69f0ae;display:inline-block;" title="URL personalizada activa"></span>
+                            @else
+                                <span style="width:8px;height:8px;border-radius:50%;background:#9999bb;display:inline-block;" title="Usando URL por defecto"></span>
+                            @endif
+                        </a>
+                    </li>
                 @endif
                 <li><a href="{{ route('consultas.search') }}" class="{{ request()->routeIs('consultas.search') ? 'active' : '' }}">Buscar</a></li>
                 <li><a href="{{ route('consultas.files') }}" class="{{ request()->routeIs('consultas.files') ? 'active' : '' }}">Archivos</a></li>

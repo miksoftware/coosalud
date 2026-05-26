@@ -17,7 +17,7 @@ class CoosaludService
     public function __construct()
     {
         $config = config('coosalud');
-        $this->baseUrl = $config['base_url'];
+        $this->baseUrl = rtrim(session('coosalud_api_url', $config['base_url']), '/');
         $this->endpoint = $config['affiliate_endpoint'];
         $this->documentType = $config['document_type'];
         $this->timeout = $config['timeout'];

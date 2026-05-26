@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ConsultaController;
+use App\Http\Controllers\CoosaludCredentialController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Route;
@@ -18,6 +19,12 @@ Route::middleware('auth')->group(function () {
     // Admin only
     Route::middleware(RoleMiddleware::class . ':admin')->group(function () {
         Route::resource('users', UserController::class)->except(['create', 'edit', 'show']);
+
+        // Configuración URL API
+        Route::get('/coosalud/config', [CoosaludCredentialController::class, 'index'])->name('coosalud.credentials');
+        Route::post('/coosalud/config/save', [CoosaludCredentialController::class, 'save'])->name('coosalud.credentials.save');
+        Route::post('/coosalud/config/test', [CoosaludCredentialController::class, 'test'])->name('coosalud.credentials.test');
+        Route::post('/coosalud/config/reset', [CoosaludCredentialController::class, 'reset'])->name('coosalud.credentials.reset');
         Route::post('/consultas/upload', [ConsultaController::class, 'upload'])->name('consultas.upload');
         Route::get('/consultas/{consulta}/process', [ConsultaController::class, 'process'])->name('consultas.process');
         Route::post('/consultas/{consulta}/process-next', [ConsultaController::class, 'processNext'])->name('consultas.processNext');
